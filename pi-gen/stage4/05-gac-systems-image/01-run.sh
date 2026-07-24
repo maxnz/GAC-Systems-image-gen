@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#### Equivalent to ansible-pull for v3.0.0 (https://github.com/babatana/csinparallel-image/blob/master/updates/3.0.0.yaml)
+#### Equivalent to ansible-pull for v3.0.0 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/3.0.0.yaml)
 
 # Enable VNC Server
 
@@ -23,17 +23,17 @@ pipx ensurepath
 EOF
 
 
-# CSiP Files
+# GACSystems Files
 
-install -m 777 -d "${ROOTFS_DIR}/usr/CSiP"
-echo "Created CSiP Directory"
+install -m 777 -d "${ROOTFS_DIR}/usr/GACSystems"
+echo "Created GACSystems Directory"
 
-install -m 666 files/version "${ROOTFS_DIR}/usr/CSiP"
-install -m 777 files/csip-image.bash "${ROOTFS_DIR}/usr/CSiP"
-echo "Populated CSiP directory"
+install -m 666 files/version "${ROOTFS_DIR}/usr/GACSystems"
+install -m 777 files/gac-systems-image.bash "${ROOTFS_DIR}/usr/GACSystems"
+echo "Populated GACSystems directory"
 
-ln -f -s "/usr/CSiP/csip-image.bash" "${ROOTFS_DIR}/usr/bin/csip-image"
-echo "Created csip-image symlink"
+ln -f -s "/usr/GACSystems/gac-systems-image.bash" "${ROOTFS_DIR}/usr/bin/gac-systems-image"
+echo "Created gac-systems-image symlink"
 
 install -m 644 files/Updater.service "${ROOTFS_DIR}/lib/systemd/system/Updater.service"
 echo "Added Updater service"

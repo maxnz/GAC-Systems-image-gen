@@ -1,17 +1,17 @@
 #!/bin/bash
 
-# csinparallel-image: a tool for managing the CSinParallel Image
+# gac-systems-image: a tool for managing the GAC Systems Image
 # Created by Max Narvaez
 
-IMAGEVER=`cat /usr/CSiP/version`
+IMAGEVER=`cat /usr/GACSystems/version`
 BRANCH=
 
 show_help() {
-    echo "CSinParallel Image Tool $IMAGEVER"
+    echo "GAC Systems Image Tool $IMAGEVER"
     echo
-    echo "A tool for managing your CSinParallel image"
+    echo "A tool for managing your GAC Systems image"
     echo
-    echo "Usage: csip-image [-h|-v|info|update|git-fsck|reset-wallpaper]"
+    echo "Usage: gac-systems-image [-h|-v|info|update|git-fsck|reset-wallpaper]"
     echo "Options:"
     echo "-h                show this help message"
     echo "-v                show the current version of the image"
@@ -25,11 +25,11 @@ show_help() {
 }
 
 show_update_help() {
-    echo "CSinParallel Image Tool $IMAGEVER"
+    echo "GAC Systems Image Tool $IMAGEVER"
     echo
-    echo "csip-image update"
+    echo "Update your GAC Systems image"
     echo
-    echo "Usage: csip-image update [-h] [--branch BRANCH]" 
+    echo "Usage: gac-systems-image update [-h] [--branch BRANCH]" 
     echo "                         [--version-override VERSION]"
     echo "Options:"
     echo "-h                Show this help message"
@@ -82,7 +82,7 @@ update() {
     do
         if [ $tries -gt 3 ]
         then
-            /usr/bin/logger -t csip-image "Could not connect to internet"
+            /usr/bin/logger -t gac-systems-image "Could not connect to internet"
             exit 1
         fi
         sleep 10
@@ -90,7 +90,7 @@ update() {
     done
 
     /usr/local/bin/ansible-pull \
-    -U https://github.com/babatana/csinparallel-image.git \
+    -U https://github.com/maxnz/GAC-Systems-image.git \
     -e imgVersion=$IMAGEVER -C ${BRANCH:-master}
 }
 
