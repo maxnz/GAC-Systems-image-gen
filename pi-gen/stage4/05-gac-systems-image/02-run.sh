@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#### Equivalent to ansible-pull for v3.0.1 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/3.0.1.yaml)
+#### Equivalent to ansible-pull for v3.0.1 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/4.0.1.yaml)
 
 # Set static IP
 

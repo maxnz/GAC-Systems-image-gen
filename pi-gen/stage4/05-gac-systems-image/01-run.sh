@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#### Equivalent to ansible-pull for v3.0.0 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/3.0.0.yaml)
+#### Equivalent to ansible-pull for v3.0.0 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/4.0.0.yaml)
 
 # Enable VNC Server
 

@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#### Equivalent to ansible-pull for v3.0.2 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/3.0.2.yaml)
+#### Equivalent to ansible-pull for v3.0.2 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/4.0.2.yaml)
 
 # Add CSinParallel directory
 # git clone https://github.com/csinparallel/virtual20-code.git "${ROOTFS_DIR}/etc/skel/CSinParallel"
