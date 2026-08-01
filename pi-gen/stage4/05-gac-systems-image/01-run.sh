@@ -21,7 +21,7 @@ on_chroot << EOF
 pipx install --include-deps ansible
 pipx ensurepath
 EOF
-
+echo "Installed Ansible"
 
 # GACSystems Files
 
