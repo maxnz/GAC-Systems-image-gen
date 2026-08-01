@@ -9,7 +9,7 @@
 # EOF
 # echo "Set static IP"
 install -m 644 files/Wired.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/system-connections/Wired.nmconnection"
-echo "Configure DHCP server service"
+echo "Set static IP"
 
 
 # Add eth0 to DHCP server
