@@ -89,9 +89,9 @@ update() {
         let "tries++"
     done
 
-    /usr/local/bin/ansible-pull \
+    /usr/bin/ansible-pull \
     -U https://github.com/maxnz/GAC-Systems-image.git \
-    -e imgVersion=$IMAGEVER -C ${BRANCH:-master}
+    -e imgVersion=$IMAGEVER -C ${BRANCH:-main}
 }
 
 if test $# -eq 0
