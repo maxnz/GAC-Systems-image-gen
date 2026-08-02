@@ -8,7 +8,7 @@
 # nmcli connection add type ethernet con-name Wired ifname eth0 ipv4.method manual ipv4.address "172.27.0.254/24" ipv4.gateway "172.27.0.1" ipv4.route-metric 301 ipv6.method disabled autoconnect yes
 # EOF
 # echo "Set static IP"
-install -m 644 files/Wired.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/system-connections/Wired.nmconnection"
+install -m 600 files/Wired.nmconnection "${ROOTFS_DIR}/etc/NetworkManager/system-connections/Wired.nmconnection"
 echo "Set static IP"
 
 
