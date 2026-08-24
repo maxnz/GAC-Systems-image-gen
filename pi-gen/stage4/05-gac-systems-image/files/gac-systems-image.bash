@@ -19,8 +19,10 @@ show_help() {
     echo "info              show information about this Pi"
     echo "update            check for image updates"
     echo
+    echo "change-owner      update the contents of /etc/owner"
+    echo "change-boot-user  set autologon to specified user"
+    echo
     echo "git-fsck          check all git repositories for errors"
-    echo "reset-wallpaper   resets the wallpaper to default (temple.jpg)"
     exit 0
 }
 
@@ -75,6 +77,17 @@ git_fsck() {
     done
 }
 
+# Check the git health of the Pi
+get_git_health() {
+    GIT_ERRS=$(git_fsck)
+    if [ -z "$GIT_ERRS" ]
+    then
+        echo "Good"
+    else
+        echo "Errors Found: $(echo $GIT_ERRS)"
+    fi
+}
+
 update() {
     # Test for internet connection
     tries=0
@@ -91,7 +104,77 @@ update() {
 
     /usr/bin/ansible-pull \
     -U https://github.com/maxnz/GAC-Systems-image.git \
-    -e imgVersion=$IMAGEVER -C ${BRANCH:-main}
+    -e imgVersion=$(cat /usr/HD/version) -C ${BRANCH:-main}
+}
+
+change_owner() {
+    USERNAME="$1"
+    
+    # Check that a proper username is specified, otherwise ask until provided one
+    while /bin/true
+    do
+        if [ -z $USERNAME ]
+        then
+            echo -n "Enter your username: "
+            read USERNAME
+        elif [[ "${USERNAME,,}" == "none" ]]
+        then
+            echo "Nice try, but that's not a username"
+            echo -n "Enter your username: "
+            read USERNAME
+        elif [[ "${USERNAME,,}" == "username" ]]
+        then
+            echo "Nice try, but we want your username, not the literal string 'username'"
+            echo -n "Enter your username: "
+            read USERNAME
+        elif [[ "${USERNAME,,}" == "pi" ]]
+        then
+            echo "We would like your St. Olaf username or some other identifying string, not 'pi'"
+            echo -n "Enter your username: "
+            read USERNAME
+        else
+            break
+        fi
+    done
+
+    echo $USERNAME > /etc/owner
+    echo "Owner has been set to $USERNAME"
+}
+
+change_boot_user() {
+    if [ "$EUID" -ne 0 ]
+    then
+        echo "Please run as sudo hd-image change-boot-user"
+        return
+    fi
+
+    USER="$1"
+
+    # Check that a username is specified, otherwise ask until provided one
+    while [ -z $USER ]
+    do
+        echo -n "Enter your username: "
+        read USER
+    done
+
+    # Check that user has a home directory
+    ## Otherwise the desktop will not load and the user select screen will be shown
+    if [[ -d /home/$USER ]]
+    then
+        # Taken from raspi-config's do_boot_behaviour method (https://github.com/RPi-Distro/raspi-config/blob/master/raspi-config)
+        systemctl set-default graphical.target
+
+        ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+        cat > /etc/systemd/system/getty@tty1.service.d/autologin.conf << EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $USER --noclear %I \$TERM
+EOF
+        sed /etc/lightdm/lightdm.conf -i -e "s/^\(#\|\)autologin-user=.*/autologin-user=$USER/"
+        echo "SUCCESS: Will boot to $USER's desktop on next boot"
+    else
+        echo -e "\e[31mERROR: Specified user does not have a home directory\e[0m"
+    fi
 }
 
 if test $# -eq 0
@@ -109,6 +192,16 @@ do
             shift
             echo "Image version is: $IMAGEVER"
             echo
+            exit 0
+            ;;
+        change-boot-user)
+            shift
+            change_boot_user
+            exit 0
+            ;;
+        change-owner)
+            shift
+            change_owner
             exit 0
             ;;
         update)
@@ -157,16 +250,9 @@ do
             git_fsck
             exit $GITCHK
             ;;
-        reset-wallpaper)
-            shift
-            export DISPLAY=:0.0
-            pcmanfm --set-wallpaper /usr/share/rpd-wallpaper/temple.jpg
-            exit 0
-            ;;
         *)
             show_help
             ;;
     esac
     exit 0
 done
-
