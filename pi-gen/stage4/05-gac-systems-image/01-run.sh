@@ -15,14 +15,6 @@ sed -i 's/#hdmi_group=1/hdmi_group=2/g' "${ROOTFS_DIR}/boot/config.txt"
 sed -i 's/#hdmi_mode=1/hdmi_mode=82/g' "${ROOTFS_DIR}/boot/config.txt"
 echo "Set Resolution to DMT Mode 82 1920x1080 60Hz 16:9"
 
-# Install Ansible
-
-on_chroot << EOF
-pipx install --include-deps ansible
-pipx ensurepath
-EOF
-echo "Installed Ansible"
-
 # GACSystems Files
 
 install -m 777 -d "${ROOTFS_DIR}/usr/GACSystems"

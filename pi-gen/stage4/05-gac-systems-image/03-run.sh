@@ -30,4 +30,19 @@ then
     rm /usr/GACSystems/.updated
 fi
 EOF
-echo "Add update check to the bashrc files" 
+echo "Add update check to the bashrc files"
+
+on_chroot << EOF
+systemctl set-default graphical.target
+
+ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
+EOF
+echo "Link Getty service"
+
+install -m 644 files/autologin.conf "${ROOTFS_DIR}/etc/systemd/system/isc-dhcp-server.service"
+echo "Add autologin config"
+
+on_chroot << EOF
+sed /etc/lightdm/lightdm.conf -i -e "s/^\(#\|\)autologin-user=.*/autologin-user=pi/"
+EOF
+echo "Edit lightdm config"
