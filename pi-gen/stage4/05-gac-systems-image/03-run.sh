@@ -39,7 +39,7 @@ ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants
 EOF
 echo "Link Getty service"
 
-install -m 644 files/autologin.conf "${ROOTFS_DIR}/etc/systemd/system/isc-dhcp-server.service"
+install -m 644 files/autologin.conf "${ROOTFS_DIR}/etc/systemd/system/getty@tty1.service.d/autologin.conf"
 echo "Add autologin config"
 
 on_chroot << EOF
