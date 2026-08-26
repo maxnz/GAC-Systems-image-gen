@@ -26,7 +26,7 @@ EOF
 cat << EOF >> "${ROOTFS_DIR}/etc/skel/.bashrc"
 if [ -e /usr/GACSystems/.updated ]
 then 
-    cowsay GAC Systems has been updated to v\$(cat /usr/GACSystems/version)
+    cowsay GAC Systems Image has been updated to v\$(cat /usr/GACSystems/version)
     rm /usr/GACSystems/.updated
 fi
 EOF
@@ -34,9 +34,8 @@ echo "Add update check to the bashrc files"
 
 on_chroot << EOF
 systemctl set-default graphical.target
-
-ln -fs /lib/systemd/system/getty@.service /etc/systemd/system/getty.target.wants/getty@tty1.service
 EOF
+ln -fs "/lib/systemd/system/getty@.service" "${ROOTFS_DIR}/etc/systemd/system/getty.target.wants/getty@tty1.service"
 echo "Link Getty service"
 
 install -m 644 files/autologin.conf "${ROOTFS_DIR}/etc/systemd/system/getty@tty1.service.d/autologin.conf"
