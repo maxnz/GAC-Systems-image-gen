@@ -15,6 +15,7 @@ psk=adolphus
 
 [ipv4]
 method=auto
+route-metric=1
 
 [ipv6]
 addr-gen-mode=default

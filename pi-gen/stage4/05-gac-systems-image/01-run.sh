@@ -30,6 +30,10 @@ echo "Created gac-systems-image symlink"
 install -m 644 files/Updater.service "${ROOTFS_DIR}/lib/systemd/system/Updater.service"
 echo "Added Updater service"
 
+on_chroot << EOF
+systemctl enable Updater
+EOF
+echo "Enabled Updater service"
 
 # Set Keyboard Locale
 
