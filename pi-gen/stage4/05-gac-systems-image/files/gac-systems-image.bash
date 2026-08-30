@@ -48,7 +48,7 @@ missing_argument() {
 
 info() {
     # Load our information functions
-    source /usr/HD/get-info.bash
+    source /usr/GACSystems/get-info.bash
 
     echo "Image Version:        $(get_image_version)"
     echo "Hardware Revision:    $(get_pi_rev)"
@@ -90,7 +90,7 @@ update() {
         let "tries++"
     done
 
-    source /usr/HD/get-info.bash
+    source /usr/GACSystems/get-info.bash
 
     /usr/bin/ansible-pull \
     -U https://github.com/maxnz/GAC-Systems-image.git \
