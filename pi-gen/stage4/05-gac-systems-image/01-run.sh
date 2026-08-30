@@ -5,7 +5,7 @@
 # Enable VNC Server
 
 on_chroot << EOF
-systemctl enable vncserver-x11-serviced.service
+systemctl enable wayvnc.service
 EOF
 echo "Enabled VNC server"
 
