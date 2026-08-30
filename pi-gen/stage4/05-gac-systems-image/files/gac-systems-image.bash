@@ -3,7 +3,6 @@
 # gac-systems-image: a tool for managing the GAC Systems Image
 # Created by Max Narvaez
 
-IMAGEVER=`cat /usr/GACSystems/version`
 BRANCH=
 
 show_help() {
@@ -19,8 +18,8 @@ show_help() {
     echo "info              show information about this Pi"
     echo "update            check for image updates"
     echo
-    echo "change-owner      update the contents of /etc/owner"
-    echo "change-boot-user  set autologon to specified user"
+    echo "change-boot-user  change which user the pi will boot the desktop to"
+    echo "change-owner      change the contents of /etc/owner"
     echo
     echo "git-fsck          check all git repositories for errors"
     exit 0
@@ -32,7 +31,7 @@ show_update_help() {
     echo "Update your GAC Systems image"
     echo
     echo "Usage: gac-systems-image update [-h] [--branch BRANCH]" 
-    echo "                         [--version-override VERSION]"
+    echo "                                [--version-override VERSION]"
     echo "Options:"
     echo "-h                Show this help message"
     echo "-b BRANCH, --branch BRANCH"
@@ -48,18 +47,18 @@ missing_argument() {
 }
 
 info() {
-    SERIAL=`cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2`
-    IPv4=`ifconfig wlan0 | grep "inet " | sed 's/  \+/ /g' | cut -d ' ' -f 3`
-    MAC=`ifconfig wlan0 | grep ether | sed 's/  \+/ /g' | cut -d ' ' -f 3`
-    SDSERIAL=`cat /sys/block/mmcblk0/device/cid`
-    HARDREV=`cat /proc/cpuinfo | grep Revision | cut -d ' ' -f 2`
+    # Load our information functions
+    source /usr/HD/get-info.bash
 
-    echo "Image Version:        $IMAGEVER"
-    echo "Hardware Revision:    $HARDREV"
-    echo "Pi Serial Number:     $SERIAL"
-    echo "SD Serial Number:     $SDSERIAL"
-    echo "WiFi IP:              $IPv4"
-    echo "WiFi MAC:             $MAC"
+    echo "Image Version:        $(get_image_version)"
+    echo "Hardware Revision:    $(get_pi_rev)"
+    echo "Pi Serial Number:     $(get_pi_serial)"
+    echo "SD Serial Number:     $(get_sd_serial)"
+    echo "WiFi IP:              $(get_ip wlan0)"
+    echo "WiFi MAC:             $(get_mac wlan0)"
+    echo "Ethernet IP:          $(get_ip eth0)"
+    echo "Ethernet MAC:         $(get_mac eth0)"
+    echo "Owner:                $(get_owner)"
 }
 
 git_fsck() {
@@ -77,17 +76,6 @@ git_fsck() {
     done
 }
 
-# Check the git health of the Pi
-get_git_health() {
-    GIT_ERRS=$(git_fsck)
-    if [ -z "$GIT_ERRS" ]
-    then
-        echo "Good"
-    else
-        echo "Errors Found: $(echo $GIT_ERRS)"
-    fi
-}
-
 update() {
     # Test for internet connection
     tries=0
@@ -95,60 +83,29 @@ update() {
     do
         if [ $tries -gt 3 ]
         then
-            /usr/bin/logger -t gac-systems-image "Could not connect to internet"
+            echo "Could not connect to internet"
             exit 1
         fi
         sleep 10
         let "tries++"
     done
 
+    source /usr/HD/get-info.bash
+
     /usr/bin/ansible-pull \
     -U https://github.com/maxnz/GAC-Systems-image.git \
-    -e imgVersion=$(cat /usr/HD/version) -C ${BRANCH:-main}
-}
-
-change_owner() {
-    USERNAME="$1"
-    
-    # Check that a proper username is specified, otherwise ask until provided one
-    while /bin/true
-    do
-        if [ -z $USERNAME ]
-        then
-            echo -n "Enter your username: "
-            read USERNAME
-        elif [[ "${USERNAME,,}" == "none" ]]
-        then
-            echo "Nice try, but that's not a username"
-            echo -n "Enter your username: "
-            read USERNAME
-        elif [[ "${USERNAME,,}" == "username" ]]
-        then
-            echo "Nice try, but we want your username, not the literal string 'username'"
-            echo -n "Enter your username: "
-            read USERNAME
-        elif [[ "${USERNAME,,}" == "pi" ]]
-        then
-            echo "We would like your St. Olaf username or some other identifying string, not 'pi'"
-            echo -n "Enter your username: "
-            read USERNAME
-        else
-            break
-        fi
-    done
-
-    echo $USERNAME > /etc/owner
-    echo "Owner has been set to $USERNAME"
+    -e imgVersion=${IMAGEVER:-$(cat /usr/GACSystems/version)} -C ${BRANCH:-main}
 }
 
 change_boot_user() {
     if [ "$EUID" -ne 0 ]
     then
-        echo "Please run as sudo hd-image change-boot-user"
+        echo "Please run as sudo gac-systems-image change-boot-user"
         return
     fi
 
-    USER="$1"
+    #put agument in username
+    USER=$1
 
     # Check that a username is specified, otherwise ask until provided one
     while [ -z $USER ]
@@ -177,6 +134,28 @@ EOF
     fi
 }
 
+change_owner() {
+    username=$1
+
+    if [ -z "$username" ]
+    then
+        echo "Please enter a username"
+        exit 1
+    elif [[ "$username" == "None" ]]
+    then
+        echo "Nice try, but that's not a username"
+        exit 1
+    elif [[ "$username" == "username" ]]
+    then
+        echo "Nice try, but we want your username, not the literal string 'username'"
+        exit 1
+    fi
+
+    echo $username > /etc/owner
+
+    echo "Owner has been set to $username"
+}
+
 if test $# -eq 0
 then
     show_help
@@ -192,16 +171,6 @@ do
             shift
             echo "Image version is: $IMAGEVER"
             echo
-            exit 0
-            ;;
-        change-boot-user)
-            shift
-            change_boot_user
-            exit 0
-            ;;
-        change-owner)
-            shift
-            change_owner
             exit 0
             ;;
         update)
@@ -249,6 +218,16 @@ do
             shift
             git_fsck
             exit $GITCHK
+            ;;
+        change-boot-user)
+            shift
+            change_boot_user $1
+            exit 0
+            ;;
+        change-owner)
+            shift
+            change_owner $1
+            exit 0
             ;;
         *)
             show_help

@@ -22,6 +22,7 @@ echo "Created GACSystems Directory"
 
 install -m 666 files/version "${ROOTFS_DIR}/usr/GACSystems"
 install -m 777 files/gac-systems-image.bash "${ROOTFS_DIR}/usr/GACSystems"
+install -m 777 files/get-info.bash "${ROOTFS_DIR}/usr/GACSystems"
 echo "Populated GACSystems directory"
 
 ln -f -s "/usr/GACSystems/gac-systems-image.bash" "${ROOTFS_DIR}/usr/bin/gac-systems-image"
