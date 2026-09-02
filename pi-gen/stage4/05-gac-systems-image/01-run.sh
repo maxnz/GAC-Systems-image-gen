@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-#### Equivalent to ansible-pull for v3.0.0 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/4.0.0.yaml)
+#### Equivalent to ansible-pull for v4.0.0 (https://github.com/maxnz/GAC-Systems-image/blob/master/updates/4.0.0.yaml)
 
 # Enable VNC Server
 
@@ -38,8 +38,12 @@ echo "Enabled Updater service"
 
 # Set Keyboard Locale
 
-on_chroot << EOF
-echo "XKBMODEL=pc105\nXKBLAYOUT=us\nXKBVARIANT=\nXKBOPTIONS=\nBACKSPACE=guess" > /etc/default/keyboard
+cat << EOF >> "${ROOTFS_DIR}/etc/default/keyboard"
+XKBMODEL=pc105
+XKBLAYOUT=us
+XKBVARIANT=
+XKBOPTIONS=
+BACKSPACE=guess
 EOF
 
 
